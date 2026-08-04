@@ -1,0 +1,41 @@
+{
+  "assignment": "ML-03",
+  "lane": "Lane 2 - Refresh / Content Opportunity Scoring",
+  "scope_note": "refresh action only; expansion/protection/pruning/monitoring out of scope",
+  "random_seed": 42,
+  "rows_total": 30000,
+  "rows_eligible": 17964,
+  "clients_eligible": 30,
+  "clients_scored": 23,
+  "target": "headroom_abs = max(0, impressions_prev_30d - impressions_last_30d)",
+  "label_rule": {
+    "drop_pct_min": 0.2,
+    "drop_abs_min": 500
+  },
+  "base_rate_pooled": 0.2592,
+  "base_rate_client_avg": 0.1946,
+  "metric": "Precision@15",
+  "split": "GroupKFold(n_splits=5) on client_id, zero overlap asserted",
+  "sort_kind": "mergesort (stable) - required, days_since_last_update has heavy ties",
+  "baseline_fold_spread": {
+    "mean": 0.483,
+    "sd": 0.0615
+  },
+  "baselines": {
+    "random (seed 42)": 0.1652,
+    "staleness rule (days_since_last_update)": 0.2261,
+    "staleness + log volume (hand z-sum)": 0.4029,
+    "volume rule (impressions_prev_30d)": 0.4609,
+    "ORACLE ceiling": 0.7855
+  },
+  "ship_threshold": 0.55,
+  "barred_features": [
+    "trend_pct",
+    "trend_direction",
+    "impressions_last_30d",
+    "clicks_last_30d",
+    "sessions_last_30d",
+    "content_id",
+    "client_id"
+  ]
+}
