@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Finding Pages That Under-Capture Clicks: A CTR Opportunity Score for Content Prioritisation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F8FA;
+    --paper: #FFFFFF;
+    --ink: #1C2430;
+    --muted: #5B6573;
+    --rule: #DDE2E8;
+    --accent: #1F6F78;
+    --accent-soft: #E6F1F2;
+    --fig-bg: #FFFFFF;
+    color-scheme: light;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141A21;
+      --paper: #1B232C;
+      --ink: #E4E8ED;
+      --muted: #A3ADB9;
+      --rule: #2E3946;
+      --accent: #6FC1C9;
+      --accent-soft: #1F3236;
+      --fig-bg: #FFFFFF;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141A21; --paper: #1B232C; --ink: #E4E8ED; --muted: #A3ADB9;
+    --rule: #2E3946; --accent: #6FC1C9; --accent-soft: #1F3236; --fig-bg: #FFFFFF;
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-size: 1.125rem;
+    line-height: 1.7;
+  }
+  .paper {
+    max-width: 46rem;
+    margin: 2.5rem auto 4rem;
+    padding: 3rem clamp(1.25rem, 5vw, 3.5rem);
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+  }
+  header { border-bottom: 1px solid var(--rule); padding-bottom: 1.75rem; margin-bottom: 2rem; }
+  h1 {
+    font-size: clamp(1.75rem, 4.2vw, 2.4rem);
+    line-height: 1.2;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    letter-spacing: -0.01em;
+  }
+  .byline { font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 0.95rem; color: var(--muted); margin: 0; }
+  .byline strong { color: var(--ink); font-weight: 600; }
+  .abstract {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+    padding: 1.25rem 1.5rem;
+    margin: 0 0 2.5rem;
+    border-radius: 0 4px 4px 0;
+  }
+  .abstract h2 { margin-top: 0; font-size: 1.1rem; }
+  .abstract p { margin: 0; }
+  h2 {
+    font-size: 1.45rem;
+    line-height: 1.3;
+    margin: 2.75rem 0 0.75rem;
+    font-weight: 700;
+  }
+  h2 .num { color: var(--accent); margin-right: 0.4rem; }
+  h3 { font-size: 1.15rem; margin: 1.75rem 0 0.5rem; font-weight: 600; }
+  p { margin: 0 0 1.1rem; }
+  a { color: var(--accent); text-underline-offset: 2px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  ul, ol { padding-left: 1.4rem; margin: 0 0 1.1rem; }
+  li { margin-bottom: 0.4rem; }
+  figure { margin: 2rem 0; }
+  figure img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    background: var(--fig-bg);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+  figcaption {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--muted);
+    margin-top: 0.7rem;
+  }
+  figcaption b { color: var(--ink); }
+  .table-wrap { overflow-x: auto; margin: 1.5rem 0 2rem; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.88rem;
+    font-variant-numeric: tabular-nums;
+  }
+  th, td { padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--rule); text-align: right; white-space: nowrap; }
+  th { font-weight: 600; color: var(--muted); border-bottom: 2px solid var(--rule); }
+  th:first-child, td:first-child { text-align: left; }
+  td.text { text-align: left; white-space: normal; }
+  tr.avg td { font-weight: 600; border-top: 2px solid var(--rule); }
+  .caption-above {
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    font-size: 0.88rem; color: var(--muted); margin-bottom: 0.5rem;
+  }
+  .finding {
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 1.25rem 0;
+    margin: 2rem 0;
+  }
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 0.85em;
+    background: var(--accent-soft);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+  }
+  footer {
+    margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--rule);
+    font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 0.85rem; color: var(--muted);
+  }
+  @media (max-width: 600px) {
+    body { font-size: 1.05rem; }
+    .paper { margin: 0; border: none; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+<main class="paper">
+
+<header>
+  <h1>Finding Pages That Under-Capture Clicks: A CTR Opportunity Score for Content Prioritisation</h1>
+  <p class="byline"><strong>Drishika Aneja</strong>, FlyRank ML Internship capstone, CTR / Engagement Opportunity Scoring lane, November 2026</p>
+</header>
+
+<section class="abstract" aria-labelledby="abstract">
+  <h2 id="abstract">Abstract</h2>
+  <p>Content teams cannot review every page, so they need to know which visible pages are getting fewer clicks than their search position would suggest. Using a 90-day, query-level release of the FlyRank internship warehouse (2.27 million query–page rows across 39,020 pages), I estimated each page’s expected clicks from its search positions and compared it with the clicks it actually received. A position-only baseline was compared against a gradient-boosted model that adds query and page features, using 5-fold validation that holds out whole clients. The model ranked pages slightly but consistently better than the baseline (Spearman 0.709 vs 0.698, better in 5 of 5 folds), while not reliably reducing click-count error. The resulting opportunity list is highly concentrated: the top 10% of under-performing pages account for 69.7% of all estimated missing clicks, and each page carries a reason code that points to a metadata, content, or monitoring review.</p>
+</section>
+
+<section aria-labelledby="intro">
+  <h2 id="intro"><span class="num">1</span>Introduction and problem statement</h2>
+  <p>A page that appears often in search results but rarely gets clicked is a missed opportunity. Its visibility is already earned; what is lacking is the reason for a searcher to choose it. Improving a title, a meta description, or the match between the page and the searcher’s intent is often cheaper than earning a better ranking from scratch.</p>
+  <p>The difficulty is prioritisation. A content team managing tens of thousands of pages has limited editorial time. This project supports one decision: <em>which pages should be reviewed first, and what kind of review does each need?</em></p>
+  <p>To answer it, I asked: <strong>given where a page appears in search, how many clicks would we normally expect, and which pages fall furthest below that expectation?</strong> The output is a ranked list of pages with a recommended action for each, rather than a claim about why any page under-performs.</p>
+</section>
+
+<section aria-labelledby="data">
+  <h2 id="data"><span class="num">2</span>Data</h2>
+  <p><strong>Release.</strong> FlyRank Internship pseudonymised warehouse release <code>v20260703</code> (frozen snapshot exported 3 July 2026), accessed through Hugging Face. Clients, pages, keywords and queries are represented only by salted hash IDs. No client names, domains, URLs or query text appear in this paper.</p>
+  <p><strong>Tables used.</strong></p>
+  <ul>
+    <li><code>fact_content_query_90d</code>: the main table. One row per client, page and query hash, with impressions, clicks and average position over a fixed 90-day window. This is the level at which all modelling was done.</li>
+    <li><code>dim_content</code>: page-level attributes (word count, content type, main search intent, keyword competition, search volume), joined on client and page hash.</li>
+    <li><code>fact_content_daily_performance</code> (latest-month sample): used only for initial exploration.</li>
+  </ul>
+  <p><strong>Date window.</strong> 2 April 2026 to 30 June 2026 (90 days).</p>
+  <p><strong>Exclusions and why.</strong></p>
+  <ul>
+    <li>Rows with zero impressions, because a click rate cannot be computed for them.</li>
+    <li>Rows with an average position below 1. The best possible search position is 1, so these values are invalid and were treated as data errors.</li>
+    <li>For page-level evaluation and ranking, pages with fewer than 500 impressions in the window, because click rates on very few impressions are too noisy to act on.</li>
+  </ul>
+  <p>After exclusions, 2,274,658 query–page rows remained, covering 52 clients. 39,020 pages met the 500-impression threshold.</p>
+  <p><strong>Why query level, not page level.</strong> An early page-level analysis produced an implausible pattern in which pages at position 1 had lower click rates than pages at position 4. Repeating the analysis at query level restored the expected decline in click rate with position (Figure 1). Averaging one page’s many queries into a single position blurs the relationship, so all later steps work at query level and sum up to pages afterwards.</p>
+  <p><strong>A note on lane choice.</strong> My provisional lane in Week 3 was Refresh / Content Opportunity Scoring (notebook <code>w03</code> in the repo). For the capstone I moved to CTR / Engagement Opportunity Scoring, because the query-level table supports a clear expected-versus-actual comparison and a directly actionable output.</p>
+</section>
+
+<section aria-labelledby="method">
+  <h2 id="method"><span class="num">3</span>Methodology</h2>
+
+  <h3>Label</h3>
+  <p>The target is the click-through rate (CTR) of each query–page row: clicks divided by impressions. Rows are weighted by impressions during training, so a row seen 10,000 times counts more than one seen 10 times.</p>
+
+  <h3>Baseline</h3>
+  <p>For each position bucket (1 to 19, and 20+), the baseline computes the pooled CTR in the training data. A row’s expected clicks are its impressions multiplied by the CTR for its bucket. This represents the simple rule “pages at this rank normally get this share of clicks.”</p>
+
+  <h3>Model</h3>
+  <p>A histogram gradient-boosting regressor (scikit-learn, 200 iterations, <code>random_state=42</code>) predicting CTR from eight features:</p>
+  <ul>
+    <li>Search features: average position, query length in words, query length in characters.</li>
+    <li>Page features: word count, content type, main search intent, keyword competition, keyword search volume.</li>
+  </ul>
+  <p>No feature is derived from clicks, so the model cannot see the answer it is predicting.</p>
+
+  <h3>Validation design</h3>
+  <p>I used 5-fold grouped cross-validation with <strong>client</strong> as the group. In each fold, every row from roughly a fifth of the clients is held out, and both the baseline curve and the model are fitted only on the remaining clients. This tests whether the approach generalises to clients it has never seen, which is closer to real use than a random row split.</p>
+  <p>Evaluation is done at page level (pages with at least 500 impressions in the held-out clients) using two metrics:</p>
+  <ul>
+    <li><strong>Average absolute error</strong> in predicted clicks per page (lower is better).</li>
+    <li><strong>Spearman rank correlation</strong> between predicted and actual clicks (higher is better). This matters most here, because the output is a ranking.</li>
+  </ul>
+
+  <h3>Leakage checks</h3>
+  <ul>
+    <li>The join to <code>dim_content</code> was checked to leave the row count unchanged (2,274,658 before and after), so no rows were duplicated.</li>
+    <li>The baseline position curve is learned only from training clients in every fold.</li>
+    <li>For the final ranking, every page is scored <em>out of fold</em>: its expected clicks come from a model that never saw that page’s client.</li>
+  </ul>
+
+  <h3>Opportunity score and reason codes</h3>
+  <p>For each page, <strong>missing clicks = expected clicks − actual clicks</strong>, summed across its queries. Pages are ranked by missing clicks, largest first. Each page then receives one reason code from simple rules based on its impression-weighted average position:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Reason code</th><th class="text">Rule</th><th class="text">Recommended review</th></tr></thead>
+      <tbody>
+        <tr><td>ZERO_CLICKS</td><td class="text">0 clicks and at least 5,000 impressions</td><td class="text">Monitoring: check the page and tracking</td></tr>
+        <tr><td>OK_PROTECT</td><td class="text">Actual clicks ≥ expected clicks</td><td class="text">None: avoid changes that could hurt it</td></tr>
+        <tr><td>TOP3_LOW_CTR</td><td class="text">Below expected, average position ≤ 3</td><td class="text">Metadata: rewrite title and meta description</td></tr>
+        <tr><td>PAGE1_LOW_CTR</td><td class="text">Below expected, average position 3–10</td><td class="text">Metadata and intent: improve snippet and match what searchers want</td></tr>
+        <tr><td>PAGE2_LOW_CTR</td><td class="text">Below expected, average position &gt; 10</td><td class="text">Content: improve the page to reach page 1 first</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section aria-labelledby="results">
+  <h2 id="results"><span class="num">4</span>Results</h2>
+
+  <h3>Click rate falls with position</h3>
+  <figure>
+    <img src="fig1_ctr_by_position.png" alt="Line chart of click-through rate by average Google position. CTR is about 0.65% at position 1, falls to about 0.1% by position 10, stays roughly flat to position 19, and is about 0.04% at 20 and beyond.">
+    <figcaption><b>Figure 1.</b> Pooled click-through rate by average position, query level, all clients. CTR is about 0.65% at position 1 and falls to about 0.10% at position 10. Click rates in this dataset are low overall; this is an observed property of this release, not a general statement about search.</figcaption>
+  </figure>
+
+  <h3>Model versus baseline on held-out clients</h3>
+  <p class="caption-above">Table 1. Page-level results for each fold (same split for baseline and model).</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Fold</th><th>Test pages</th><th>Baseline error</th><th>Model error</th><th>Baseline Spearman</th><th>Model Spearman</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>10,552</td><td>8.212</td><td>7.436</td><td>0.812</td><td>0.813</td></tr>
+        <tr><td>2</td><td>6,932</td><td>7.272</td><td>8.959</td><td>0.560</td><td>0.569</td></tr>
+        <tr><td>3</td><td>7,286</td><td>6.947</td><td>6.483</td><td>0.693</td><td>0.712</td></tr>
+        <tr><td>4</td><td>6,695</td><td>9.904</td><td>9.611</td><td>0.673</td><td>0.688</td></tr>
+        <tr><td>5</td><td>7,555</td><td>7.970</td><td>8.116</td><td>0.752</td><td>0.764</td></tr>
+        <tr class="avg"><td>Average</td><td>7,804</td><td>8.061</td><td>8.121</td><td>0.698</td><td>0.709</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The model achieved a higher rank correlation than the baseline in all five folds, by between 0.001 and 0.019. On click-count error it was better in three folds and worse in two, and slightly worse on average, driven mainly by fold 2. Fold-to-fold variation (Spearman from 0.56 to 0.81) is larger than the gap between methods, which shows how much results depend on which clients are held out.</p>
+  <figure>
+    <img src="fig2_model_vs_baseline.png" alt="Grouped bar chart comparing baseline and model Spearman rank correlation in five rounds. The model bar is slightly higher in every round.">
+    <figcaption><b>Figure 2.</b> Spearman rank correlation for baseline and model in each held-out-client fold. The model’s advantage is small but appears in every fold.</figcaption>
+  </figure>
+  <p>The conclusion is that <strong>position explains most of the variation in click rate</strong>. Query and page features add a small, consistent improvement in ordering pages, which is what the ranking uses, but they do not make click counts reliably more accurate.</p>
+
+  <h3>How pages are distributed across actions</h3>
+  <figure>
+    <img src="fig3_reason_codes.png" alt="Horizontal bar chart of pages per reason code: OK_PROTECT about 14,200, PAGE2_LOW_CTR about 13,100, PAGE1_LOW_CTR about 10,900, TOP3_LOW_CTR 454, ZERO_CLICKS 385.">
+    <figcaption><b>Figure 3.</b> Pages by reason code (n = 39,020). 14,199 pages (36%) meet or exceed expected clicks. Of the 24,821 under-performing pages, 13,080 sit beyond position 10, 10,902 are on page 1 below the top 3, 454 are in the top 3, and 385 have zero clicks despite at least 5,000 impressions.</figcaption>
+  </figure>
+
+  <h3>The opportunity is concentrated</h3>
+  <p class="finding">The top 10% of under-performing pages account for 69.7% of all estimated missing clicks.</p>
+  <figure>
+    <img src="fig4_concentration.png" alt="Cumulative curve showing the percentage of all missing clicks against the percentage of under-performing pages, sorted by largest gap. The curve rises steeply and reaches about 70% at 10% of pages.">
+    <figcaption><b>Figure 4.</b> Cumulative share of estimated missing clicks, with under-performing pages ordered from largest gap to smallest. The dashed line marks the top 10% of pages.</figcaption>
+  </figure>
+</section>
+
+<section aria-labelledby="limits">
+  <h2 id="limits"><span class="num">5</span>Limitations and honest framing</h2>
+  <ul>
+    <li><strong>Observational, not causal.</strong> “Missing clicks” is a gap between observed clicks and what similar positions received in this data. It does not prove that changing a page will recover those clicks, and nothing here explains how Google ranks pages.</li>
+    <li><strong>Decision support, not automation.</strong> The list says where to look first. A person should still review each page before changing it.</li>
+    <li><strong>One 90-day window.</strong> The query table covers a single fixed window, so there is no time-based validation and no evidence of how stable these gaps are over time.</li>
+    <li><strong>Few clients.</strong> Only 52 clients have query-level data. Results vary noticeably between folds, so the small model gain should be read as directional.</li>
+    <li><strong>Averaged positions.</strong> Each row uses a 90-day average position. A page that moved during the window is represented by one number.</li>
+    <li><strong>Heuristic thresholds.</strong> The 500-impression cut-off, the 5,000-impression zero-click rule and the position bands for reason codes are practical choices, not tuned values.</li>
+    <li><strong>Zero-click pages may be data issues.</strong> Some ZERO_CLICKS pages may reflect tracking or reporting gaps rather than real behaviour, which is why their action is “check” rather than “rewrite”.</li>
+    <li><strong>Low overall click rates.</strong> CTR is under 1% even at position 1 in this release. I report this as observed and do not speculate on the cause.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="recs">
+  <h2 id="recs"><span class="num">6</span>Ranked recommendations</h2>
+  <p>The action playbook, in priority order:</p>
+  <ol>
+    <li><strong>Start with the top of the list.</strong> Because the opportunity is concentrated, reviewing roughly the top 10% of under-performing pages (about 2,500 pages) addresses about 70% of the estimated gap.</li>
+    <li><strong>Within that group, do TOP3_LOW_CTR pages first.</strong> They already rank highly, so a title and meta description rewrite is the lowest-effort change with the clearest expected upside.</li>
+    <li><strong>Then PAGE1_LOW_CTR pages.</strong> Review the snippet and check whether the page answers the intent behind its main queries.</li>
+    <li><strong>Check ZERO_CLICKS pages before editing them.</strong> Confirm the page is live, indexed and tracked correctly.</li>
+    <li><strong>Treat PAGE2_LOW_CTR pages as content projects.</strong> A better snippet helps little beyond page 1, so the first goal is improving the content.</li>
+    <li><strong>Leave OK_PROTECT pages alone</strong> unless there is another reason to change them.</li>
+  </ol>
+  <p class="caption-above">Table 2. The ten pages with the largest estimated missing clicks (pseudonymised IDs).</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Rank</th><th>Page ID</th><th>Impressions</th><th>Clicks</th><th>Expected</th><th>Avg position</th><th>Missing</th><th>Reason</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>content_15168cd1c94e3529</td><td>311,895</td><td>178</td><td>4,476</td><td>3.5</td><td>4,298</td><td>PAGE1_LOW_CTR</td></tr>
+        <tr><td>2</td><td>content_943dc881428182b8</td><td>606,831</td><td>344</td><td>4,120</td><td>2.0</td><td>3,776</td><td>TOP3_LOW_CTR</td></tr>
+        <tr><td>3</td><td>content_d0acf7062bc6b257</td><td>297,755</td><td>33</td><td>1,244</td><td>2.1</td><td>1,211</td><td>TOP3_LOW_CTR</td></tr>
+        <tr><td>4</td><td>content_4c15fe8dc370f3cd</td><td>266,229</td><td>459</td><td>1,634</td><td>3.0</td><td>1,175</td><td>PAGE1_LOW_CTR</td></tr>
+        <tr><td>5</td><td>content_c1f764a2f362d1c3</td><td>352,256</td><td>54</td><td>961</td><td>7.3</td><td>907</td><td>PAGE1_LOW_CTR</td></tr>
+        <tr><td>6</td><td>content_7471467133493ce6</td><td>217,524</td><td>30</td><td>856</td><td>2.8</td><td>826</td><td>TOP3_LOW_CTR</td></tr>
+        <tr><td>7</td><td>content_86c96002dd5c69aa</td><td>69,021</td><td>176</td><td>945</td><td>17.7</td><td>769</td><td>PAGE2_LOW_CTR</td></tr>
+        <tr><td>8</td><td>content_ba3549b112cc00e0</td><td>108,012</td><td>16</td><td>785</td><td>4.8</td><td>769</td><td>PAGE1_LOW_CTR</td></tr>
+        <tr><td>9</td><td>content_bddfdd871aa09fbe</td><td>156,932</td><td>9</td><td>749</td><td>2.5</td><td>740</td><td>TOP3_LOW_CTR</td></tr>
+        <tr><td>10</td><td>content_0a0cdd4071a7ed1c</td><td>80,082</td><td>140</td><td>858</td><td>10.3</td><td>718</td><td>PAGE2_LOW_CTR</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Example reading: the top-ranked page averages position 3.5 across its queries and would be expected to receive about 4,476 clicks over the window, but received 178. Its first review should be its title and meta description.</p>
+</section>
+
+<section aria-labelledby="repro">
+  <h2 id="repro"><span class="num">7</span>Reproducibility</h2>
+  <ul>
+    <li><strong>Repository:</strong> <a href="https://github.com/drishikaaneja/flyrank-ml-internship-starter">github.com/drishikaaneja/flyrank-ml-internship-starter</a></li>
+    <li><strong>Capstone notebook:</strong> <code>work/capstone.ipynb</code>, which contains every query, model and chart in this paper, in order.</li>
+    <li><strong>Data access:</strong> request access to the gated FlyRank internship warehouse on Hugging Face, create a read token, and store it as a Colab secret. The token is never written in the notebook.</li>
+    <li><strong>Tools:</strong> Python in Google Colab, DuckDB reading Parquet over <code>hf://</code>, pandas, scikit-learn (<code>HistGradientBoostingRegressor</code>, <code>GroupKFold</code>), SciPy, matplotlib.</li>
+    <li><strong>Determinism:</strong> <code>random_state=42</code> for the model; <code>GroupKFold</code> splits are deterministic given the data.</li>
+  </ul>
+</section>
+
+<section aria-labelledby="ack">
+  <h2 id="ack"><span class="num">8</span>Acknowledgments and data credit</h2>
+  <p>Built on the FlyRank ML Internship dataset (<a href="https://flyrank.ai">https://flyrank.ai</a>). Thanks to the FlyRank ML internship team for preparing the pseudonymised warehouse and the starter workflow this analysis builds on.</p>
+</section>
+
+<footer>
+  All identifiers in this paper are pseudonymised hashes. No client names, domains, URLs, query text or raw data exports are included.
+</footer>
+
+</main>
+</body>
+</html>
