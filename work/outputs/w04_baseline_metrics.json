@@ -1,0 +1,54 @@
+{
+  "assignment": "ML-07 Baseline Action Score and Top-10 Review",
+  "lane": "CTR / Engagement Opportunity Scoring (confirmed; switched from provisional Lane 2)",
+  "release": "v20260703",
+  "input_window": "previous 30 days of fact_content_query_90d",
+  "input_columns_used": [
+    "imp_prev30",
+    "clicks_prev30",
+    "pos_prev30"
+  ],
+  "eval_only_columns": [
+    "imp_last30",
+    "clicks_last30"
+  ],
+  "rows_input_window": 1995557,
+  "pages_scored": 119131,
+  "pages_flagged": 8884,
+  "signal_1": {
+    "name": "CTR vs position",
+    "n_rows": 1995557,
+    "spearman": -1.0,
+    "verdict": "CONFIRMED",
+    "ctr_pct_by_band": {
+      "1": 0.8245,
+      "2": 0.5323,
+      "3": 0.4016,
+      "4-5": 0.291,
+      "6-10": 0.1525,
+      "11-20": 0.1344,
+      "21+": 0.0466
+    }
+  },
+  "signal_2": {
+    "name": "Query volume vs CTR on page one",
+    "n_rows": 988120,
+    "spearman": -1.0,
+    "verdict": "CONFIRMED",
+    "ctr_pct_by_band": {
+      "1-9": 0.426,
+      "10-49": 0.3408,
+      "50-199": 0.2911,
+      "200-999": 0.2595,
+      "1000+": 0.1443
+    }
+  },
+  "rule": {
+    "score": "expected_clicks - clicks (previous 30 days)",
+    "reason_code": "CTR_BELOW_POSITION_NORM",
+    "action": "REVIEW_TITLE_AND_META",
+    "filters": "score > 0, position <= 10, impressions >= 200"
+  },
+  "top10_weak_picks": 5,
+  "eval_top50_still_under_last30_pct": 100.0
+}
