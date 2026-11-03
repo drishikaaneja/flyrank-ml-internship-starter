@@ -1,0 +1,238 @@
+{
+  "assignment": "ML-09 Validation and Research Claim Audit",
+  "lane": "CTR / Engagement Opportunity Scoring",
+  "release": "v20260703",
+  "paper": "FlyRank, The State of AI-Driven SEO in Numbers (April 2026)",
+  "paper_findings_reviewed": [
+    "Finding 3: CTR by position tier",
+    "Part IV: Which Pages Will Grow? (growth prediction)"
+  ],
+  "rows": 1995557,
+  "rows_future_window": 1592536,
+  "setups": {
+    "A_random": "random 5-fold row split (before)",
+    "B_grouped": "5-fold GroupKFold by client (after)",
+    "C_grouped_time": "GroupKFold by client; train previous 30 days, test last 30 days (after)"
+  },
+  "before_after_mean": {
+    "A_random|baseline": {
+      "page_spearman": 0.5408387057213735,
+      "page_mae": 2.019439950186086
+    },
+    "A_random|tree": {
+      "page_spearman": 0.5589787757528837,
+      "page_mae": 2.0210093562873834
+    },
+    "A_random|boosting": {
+      "page_spearman": 0.579055219699265,
+      "page_mae": 1.9284602816823508
+    },
+    "B_grouped|baseline": {
+      "page_spearman": 0.6437441845548921,
+      "page_mae": 3.4383574764526146
+    },
+    "B_grouped|tree": {
+      "page_spearman": 0.6496593476838428,
+      "page_mae": 3.5364140573794076
+    },
+    "B_grouped|boosting": {
+      "page_spearman": 0.6559140920966544,
+      "page_mae": 3.6108725436950584
+    },
+    "C_grouped_time|baseline": {
+      "page_spearman": 0.664143022938416,
+      "page_mae": 3.281837727743582
+    },
+    "C_grouped_time|tree": {
+      "page_spearman": 0.6677490011267159,
+      "page_mae": 3.316081285746334
+    },
+    "C_grouped_time|boosting": {
+      "page_spearman": 0.6727912870710845,
+      "page_mae": 3.323434153112504
+    }
+  },
+  "wins_vs_baseline": {
+    "A_random|tree": {
+      "spearman_wins": 5,
+      "mae_wins": 2
+    },
+    "A_random|boosting": {
+      "spearman_wins": 5,
+      "mae_wins": 5
+    },
+    "B_grouped|tree": {
+      "spearman_wins": 4,
+      "mae_wins": 3
+    },
+    "B_grouped|boosting": {
+      "spearman_wins": 4,
+      "mae_wins": 3
+    },
+    "C_grouped_time|tree": {
+      "spearman_wins": 4,
+      "mae_wins": 2
+    },
+    "C_grouped_time|boosting": {
+      "spearman_wins": 4,
+      "mae_wins": 2
+    }
+  },
+  "page_overlap_fold1": {
+    "A_random": 0.9857684058610114,
+    "B_grouped": 0.0
+  },
+  "spearman_optimism_random_vs_grouped": {
+    "baseline": -0.10290547883351864,
+    "tree": -0.09068057193095913,
+    "boosting": -0.07685887239738942
+  },
+  "single_feature_spearman": [
+    {
+      "feature": "position",
+      "spearman_with_row_ctr": -0.18588193443942044
+    },
+    {
+      "feature": "word_count",
+      "spearman_with_row_ctr": 0.013590882041889891
+    },
+    {
+      "feature": "main_intent",
+      "spearman_with_row_ctr": 0.01207037316703605
+    },
+    {
+      "feature": "query_char_count",
+      "spearman_with_row_ctr": -0.007478284818296965
+    },
+    {
+      "feature": "content_type",
+      "spearman_with_row_ctr": 0.0044744930221287185
+    },
+    {
+      "feature": "search_volume",
+      "spearman_with_row_ctr": -0.0038313451045039275
+    },
+    {
+      "feature": "competition",
+      "spearman_with_row_ctr": -0.0029619395978950458
+    },
+    {
+      "feature": "query_token_count",
+      "spearman_with_row_ctr": 0.0007630547941382863
+    }
+  ],
+  "failure_examples": [
+    {
+      "kind": "over_predicted",
+      "content_hash_id": "content_943dc881428182b8",
+      "impressions": 313923,
+      "clicks": 155,
+      "predicted": 2175.671943961158,
+      "position": 2.034642253036573,
+      "n_queries": 178,
+      "top_query_share": 0.8935407727372636,
+      "likely_reason": "One query brings 89% of impressions; the model can't see whether it is a brand or navigational search."
+    },
+    {
+      "kind": "over_predicted",
+      "content_hash_id": "content_15168cd1c94e3529",
+      "impressions": 133262,
+      "clicks": 68,
+      "predicted": 1146.5816226740055,
+      "position": 3.256622292926716,
+      "n_queries": 72,
+      "top_query_share": 0.13217571400699374,
+      "likely_reason": "No single obvious cause in the available features; snippet quality or search features on the results page are not in the data."
+    },
+    {
+      "kind": "over_predicted",
+      "content_hash_id": "content_4c15fe8dc370f3cd",
+      "impressions": 106743,
+      "clicks": 95,
+      "predicted": 1019.6712560525884,
+      "position": 2.9194513925971726,
+      "n_queries": 57,
+      "top_query_share": 0.16899468817627386,
+      "likely_reason": "No single obvious cause in the available features; snippet quality or search features on the results page are not in the data."
+    },
+    {
+      "kind": "over_predicted",
+      "content_hash_id": "content_65c75874a23fca87",
+      "impressions": 185572,
+      "clicks": 5,
+      "predicted": 532.1806128555506,
+      "position": 8.186148772444119,
+      "n_queries": 111,
+      "top_query_share": 0.5447642963378095,
+      "likely_reason": "One query brings 54% of impressions; the model can't see whether it is a brand or navigational search."
+    },
+    {
+      "kind": "over_predicted",
+      "content_hash_id": "content_d0acf7062bc6b257",
+      "impressions": 122357,
+      "clicks": 15,
+      "predicted": 503.1803838081407,
+      "position": 2.0648920780993323,
+      "n_queries": 61,
+      "top_query_share": 0.9776392033148901,
+      "likely_reason": "One query brings 98% of impressions; the model can't see whether it is a brand or navigational search."
+    },
+    {
+      "kind": "under_predicted",
+      "content_hash_id": "content_e7b5dd4dff461ad2",
+      "impressions": 79352,
+      "clicks": 755,
+      "predicted": 186.69469753789153,
+      "position": 5.496912491178546,
+      "n_queries": 565,
+      "top_query_share": 0.05970863998386934,
+      "likely_reason": "Spread over 565 queries; averaging many different searches makes the expectation rough."
+    },
+    {
+      "kind": "under_predicted",
+      "content_hash_id": "content_3a6a346a5b5ba27b",
+      "impressions": 22794,
+      "clicks": 617,
+      "predicted": 70.21390876315797,
+      "position": 4.707072036500834,
+      "n_queries": 231,
+      "top_query_share": 0.16030534351145037,
+      "likely_reason": "No single obvious cause in the available features; snippet quality or search features on the results page are not in the data."
+    },
+    {
+      "kind": "under_predicted",
+      "content_hash_id": "content_1dbd310eb57d2182",
+      "impressions": 26522,
+      "clicks": 625,
+      "predicted": 82.40960865513875,
+      "position": 5.2956036498001655,
+      "n_queries": 494,
+      "top_query_share": 0.247379533971797,
+      "likely_reason": "No single obvious cause in the available features; snippet quality or search features on the results page are not in the data."
+    },
+    {
+      "kind": "under_predicted",
+      "content_hash_id": "content_67e847f6ef36cd5a",
+      "impressions": 33301,
+      "clicks": 525,
+      "predicted": 102.3497194426097,
+      "position": 4.108285036485391,
+      "n_queries": 300,
+      "top_query_share": 0.10158854088465812,
+      "likely_reason": "No single obvious cause in the available features; snippet quality or search features on the results page are not in the data."
+    },
+    {
+      "kind": "under_predicted",
+      "content_hash_id": "content_c9a0c2fdbdbfb562",
+      "impressions": 26522,
+      "clicks": 552,
+      "predicted": 151.27907371304582,
+      "position": 2.74730412487746,
+      "n_queries": 690,
+      "top_query_share": 0.05252243420556519,
+      "likely_reason": "Ranks near the top and beats the average CTR for its position; likely a strong title or a query the page answers exactly."
+    }
+  ],
+  "claims_rewritten": 7,
+  "new_claim": "Measured: under a client-grouped split the chosen tree reaches page Spearman 0.650 vs baseline 0.644; on unseen clients in a later 30-day window it reaches 0.668 vs 0.664. Directional, decision-support only."
+}
