@@ -1,0 +1,261 @@
+{
+  "assignment": "ML-08 Capstone Modeling Lane",
+  "lane": "CTR / Engagement Opportunity Scoring",
+  "release": "v20260703",
+  "input_window": "previous 30 days of fact_content_query_90d (same as Week 4)",
+  "rows": 1995557,
+  "clients": 52,
+  "features": [
+    "position",
+    "query_token_count",
+    "query_char_count",
+    "word_count",
+    "content_type",
+    "main_intent",
+    "competition",
+    "search_volume"
+  ],
+  "split": "5-fold GroupKFold by client, identical folds for all methods",
+  "page_threshold_impressions": 200,
+  "fold_metrics": [
+    {
+      "pages": 9856,
+      "page_spearman": 0.7384779654150858,
+      "page_mae": 3.453168708849464,
+      "row_wmae_ctr": 0.002825376367207468,
+      "fold": 1,
+      "method": "baseline"
+    },
+    {
+      "pages": 9856,
+      "page_spearman": 0.745470320837022,
+      "page_mae": 3.2662172528160016,
+      "row_wmae_ctr": 0.00272470657090149,
+      "fold": 1,
+      "method": "tree"
+    },
+    {
+      "pages": 9856,
+      "page_spearman": 0.7546843668855521,
+      "page_mae": 3.0506198757810647,
+      "row_wmae_ctr": 0.0025889051570093624,
+      "fold": 1,
+      "method": "boosting"
+    },
+    {
+      "pages": 6157,
+      "page_spearman": 0.5462026589132465,
+      "page_mae": 3.3571251226560763,
+      "row_wmae_ctr": 0.002695470223794952,
+      "fold": 2,
+      "method": "baseline"
+    },
+    {
+      "pages": 6157,
+      "page_spearman": 0.5373777247559012,
+      "page_mae": 4.059289606145044,
+      "row_wmae_ctr": 0.003190313944984732,
+      "fold": 2,
+      "method": "tree"
+    },
+    {
+      "pages": 6157,
+      "page_spearman": 0.5246233946549445,
+      "page_mae": 4.376428705384405,
+      "row_wmae_ctr": 0.0033749125704418364,
+      "fold": 2,
+      "method": "boosting"
+    },
+    {
+      "pages": 6223,
+      "page_spearman": 0.6315778694421635,
+      "page_mae": 2.811154603924093,
+      "row_wmae_ctr": 0.002859027858776668,
+      "fold": 3,
+      "method": "baseline"
+    },
+    {
+      "pages": 6223,
+      "page_spearman": 0.6426217466933466,
+      "page_mae": 2.6898708876441986,
+      "row_wmae_ctr": 0.0027621230423947743,
+      "fold": 3,
+      "method": "tree"
+    },
+    {
+      "pages": 6223,
+      "page_spearman": 0.6399840508803609,
+      "page_mae": 2.6672642584369193,
+      "row_wmae_ctr": 0.0027765545507278267,
+      "fold": 3,
+      "method": "boosting"
+    },
+    {
+      "pages": 5769,
+      "page_spearman": 0.6035579443350207,
+      "page_mae": 3.6258521183721695,
+      "row_wmae_ctr": 0.0034962711881583266,
+      "fold": 4,
+      "method": "baseline"
+    },
+    {
+      "pages": 5769,
+      "page_spearman": 0.615940972237728,
+      "page_mae": 3.5566250409368534,
+      "row_wmae_ctr": 0.0034899050894070696,
+      "fold": 4,
+      "method": "tree"
+    },
+    {
+      "pages": 5769,
+      "page_spearman": 0.6282685051580835,
+      "page_mae": 3.504955102333972,
+      "row_wmae_ctr": 0.0035264021431266317,
+      "fold": 4,
+      "method": "boosting"
+    },
+    {
+      "pages": 6752,
+      "page_spearman": 0.6989044848460534,
+      "page_mae": 3.9444868284612684,
+      "row_wmae_ctr": 0.0033566642134388236,
+      "fold": 5,
+      "method": "baseline"
+    },
+    {
+      "pages": 6752,
+      "page_spearman": 0.7068859738928802,
+      "page_mae": 4.110067499354938,
+      "row_wmae_ctr": 0.0034220043527000165,
+      "fold": 5,
+      "method": "tree"
+    },
+    {
+      "pages": 6752,
+      "page_spearman": 0.7127133362620235,
+      "page_mae": 4.141556185414003,
+      "row_wmae_ctr": 0.003453026838292909,
+      "fold": 5,
+      "method": "boosting"
+    }
+  ],
+  "mean_metrics": {
+    "baseline": {
+      "page_spearman": 0.643744184590314,
+      "page_mae": 3.4383574764526146,
+      "row_wmae_ctr": 0.003046561970275248
+    },
+    "tree": {
+      "page_spearman": 0.6496593476833756,
+      "page_mae": 3.5364140573794076,
+      "row_wmae_ctr": 0.0031178106000776164
+    },
+    "boosting": {
+      "page_spearman": 0.6520547307681929,
+      "page_mae": 3.548164825470073,
+      "row_wmae_ctr": 0.0031439602519197133
+    }
+  },
+  "wins_vs_baseline": {
+    "tree": {
+      "spearman": 4,
+      "mae": 3
+    },
+    "boosting": {
+      "spearman": 4,
+      "mae": 3
+    }
+  },
+  "chosen_method": "tree",
+  "permutation_importance": [
+    {
+      "feature": "query_token_count",
+      "importance": 0.00011123357505500341,
+      "std": 9.721519525371074e-05
+    },
+    {
+      "feature": "position",
+      "importance": 9.850456652540961e-05,
+      "std": 9.094497770479918e-06
+    },
+    {
+      "feature": "search_volume",
+      "importance": 1.9645922543539383e-05,
+      "std": 1.0657341692241934e-05
+    },
+    {
+      "feature": "main_intent",
+      "importance": 1.0987024211736121e-05,
+      "std": 2.4925222566362527e-06
+    },
+    {
+      "feature": "competition",
+      "importance": 5.558117389775688e-06,
+      "std": 3.6322303773493288e-06
+    },
+    {
+      "feature": "content_type",
+      "importance": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "word_count",
+      "importance": -3.194616058771876e-05,
+      "std": 9.226003762118891e-06
+    },
+    {
+      "feature": "query_char_count",
+      "importance": -3.203879468803355e-05,
+      "std": 4.210330539825462e-05
+    }
+  ],
+  "errors": {
+    "by_position_band": {
+      "1": {
+        "pages": 27.0,
+        "mean_residual": -5.815861599592592,
+        "mae": 7.5097595158336,
+        "share_under": 0.7037037037037037
+      },
+      "2": {
+        "pages": 287.0,
+        "mean_residual": -8.870894092216853,
+        "mae": 18.73135493583249,
+        "share_under": 0.5679442508710801
+      },
+      "3": {
+        "pages": 657.0,
+        "mean_residual": -5.730657082546491,
+        "mae": 17.21899745079012,
+        "share_under": 0.5555555555555556
+      },
+      "4-5": {
+        "pages": 2902.0,
+        "mean_residual": -0.5118351601763922,
+        "mae": 8.800813881259916,
+        "share_under": 0.5516884906960716
+      },
+      "6-10": {
+        "pages": 12820.0,
+        "mean_residual": -0.369942708536761,
+        "mae": 4.225902446852391,
+        "share_under": 0.585569422776911
+      },
+      "11-20": {
+        "pages": 8230.0,
+        "mean_residual": 0.08580405358714233,
+        "mae": 1.865367031409986,
+        "share_under": 0.6204131227217496
+      },
+      "21+": {
+        "pages": 9834.0,
+        "mean_residual": -0.2429194876438206,
+        "mae": 1.0001316092164196,
+        "share_under": 0.7970307097823877
+      }
+    },
+    "single_query_share_all_pages": 0.12129930661449492,
+    "single_query_share_worst10pct": 0.1450359712230216,
+    "spearman_impressions_vs_abs_error": 0.6306019767653976
+  }
+}
